@@ -23,7 +23,7 @@ module tb ();
   wire VGND = 1'b0;
 `endif
 
-  sqrt_int #(
+  tt_um_sqrt_int #(
       .WIDTH(8)
   ) dut (
 

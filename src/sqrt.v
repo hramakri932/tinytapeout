@@ -1,7 +1,7 @@
 `default_nettype none
 `timescale 1ns / 1ps
 
-module sqrt_int #(
+module tt_um_sqrt_int #(
     parameter WIDTH = 8  // must be even
 )(
     input  wire                 clk,
