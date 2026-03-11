@@ -8,7 +8,7 @@ import math
 async def rst_n_dut(dut):
     dut.rst_n.value = 0
     dut.ena.value = 1
-    dut.start.value = 0
+
     dut.ui_in.value = 0
     for _ in range(5):
         await RisingEdge(dut.clk)
@@ -18,10 +18,9 @@ async def rst_n_dut(dut):
 
 async def run_sqrt(dut, value):
     dut.ui_in.value = value
-    dut.start.value = 1
+    dut.ui_in.value = 1
     await RisingEdge(dut.clk)
-    dut.start.value = 0
-
+    dut.ui_in.value = 0
     # Wait until uio_out is set to busy
     while dut.uio_out.value == 0:
         await RisingEdge(dut.clk)
