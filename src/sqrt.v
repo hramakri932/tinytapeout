@@ -9,7 +9,7 @@ module tt_um_sqrt_int #(
     input  wire                 rst_n,    //active LOW
     input  wire                 start,
     input  wire [WIDTH-1:0]     ui_in,
-    output reg  [WIDTH/2-1:0]   uo_out, 
+    output reg  [WIDTH-1:0]   uo_out, 
     output reg                  busy,
     output reg                  done,
     output wire [7:0]            uio_oe, // remaining unused
