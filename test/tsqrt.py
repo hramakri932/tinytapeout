@@ -23,6 +23,17 @@ async def rst_n_dut(dut):
     dut.ui_in.value = 0
     for _ in range(5):
         await RisingEdge(dut.clk)
+        cocotb.log.info(f"a{_}"
+            f"clk={dut.clk.value} "
+            f"rst_n={dut.rst_n.value} "
+            f"ena={dut.ena.value} "
+            f"ui_in={dut.ui_in.value} "
+            f"uo_out={dut.uo_out.value} "
+            f"uio_out={dut.uio_out.value} "
+            f"uio_oe={dut.uio_oe.value} "
+            f"uio_in={dut.uio_in.value}"
+        )
+    
     dut.rst_n.value = 1
     await RisingEdge(dut.clk)
     cocotb.log.info(f"b"
@@ -50,6 +61,8 @@ async def run_sqrt(dut, value):
     dut.ui_in.value = value
     #dut.start.value = 1
     dut.uio_in.value=1
+    
+    await RisingEdge(dut.clk)
     cocotb.log.info(f"d"
             f"clk={dut.clk.value} "
             f"rst_n={dut.rst_n.value} "
@@ -60,10 +73,19 @@ async def run_sqrt(dut, value):
             f"uio_oe={dut.uio_oe.value} "
             f"uio_in={dut.uio_in.value}"
         )
-    await RisingEdge(dut.clk)
     #dut.start.value = 0
     dut.uio_in.value=0
     await RisingEdge(dut.clk)
+    cocotb.log.info(f"d1"
+            f"clk={dut.clk.value} "
+            f"rst_n={dut.rst_n.value} "
+            f"ena={dut.ena.value} "
+            f"ui_in={dut.ui_in.value} "
+            f"uo_out={dut.uo_out.value} "
+            f"uio_out={dut.uio_out.value} "
+            f"uio_oe={dut.uio_oe.value} "
+            f"uio_in={dut.uio_in.value}"
+        )
     # Wait until uio_out is set to busy
     while dut.uio_out.value.is_resolvable and dut.uio_out.value == 0:
         await RisingEdge(dut.clk)

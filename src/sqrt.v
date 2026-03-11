@@ -25,7 +25,7 @@ module tt_um_sqrt_int #(
     localparam RUN  = 1'b1;
     reg state;
 
-    wire rst = ~rst_n | ~ena;
+    wire rst = ~(rst_n & ena);
     wire start = uio_in[0];
     wire [7:0] radicand = ui_in;
     assign uio_oe = 8'b0;
