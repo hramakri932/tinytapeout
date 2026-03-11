@@ -32,18 +32,19 @@ module tt_um_sqrt_int #(
     wire start = uio_in[0];
     wire [7:0] radicand = ui_in;
     reg [WIDTH-1:0] root;
-    reg busy, done;
-    always @(*) begin
-    uo_out = root;
-    uio_out = {7'b0, done};
-    end
+    reg busy;
+    reg done;
+    // always @(*) begin
+    // //uo_out = root;
+    // //uio_out = {7'b0, done};
+    // end
 
     always @(posedge clk) begin
         if (rst) begin
             state          <= IDLE;
             busy           <= 1'b0;
-            done           <= 1'b0;
-            root           <= 0;
+            uio_out           <= 1'b0;
+            uo_out           <= 0;
             remainder      <= 0;
             radicand_shift <= 0;
             count          <= 0;
@@ -52,11 +53,11 @@ module tt_um_sqrt_int #(
             case (state)
 
             IDLE: begin
-                done <= 1'b0;
+                uio_out <= 1'b0;
 
                 if (start) begin
                     busy           <= 1'b1;
-                    root           <= 0;
+                    uo_out           <= 0;
                     remainder      <= 0;
                     radicand_shift <= radicand;
                     count          <= ITER[2:0];
@@ -69,15 +70,15 @@ module tt_um_sqrt_int #(
                 remainder_next = {remainder[WIDTH-3:0], radicand_shift[WIDTH-1:WIDTH-2]};
                 radicand_shift <= {radicand_shift[WIDTH-3:0], 2'b00};
 
-                // trial = (root << 2) | 1
-                trial = ({root[5:0], 2'b1});
+                // trial = (uo_out << 2) | 1
+                trial = ({uo_out[5:0], 2'b1});
 
                 if (remainder_next >= trial) begin
                     remainder <= remainder_next - trial;
-                    root      <= {4'b0, root[WIDTH/2-2:0], 1'b1};
+                    uo_out      <= {4'b0, uo_out[WIDTH/2-2:0], 1'b1};
                 end else begin
                     remainder <= remainder_next;
-                    root      <= {4'b0, root[WIDTH/2-2:0], 1'b0};
+                    uo_out      <= {4'b0, uo_out[WIDTH/2-2:0], 1'b0};
                 end
 
                 count <= count - 1;
@@ -85,7 +86,7 @@ module tt_um_sqrt_int #(
                 if (count == 1) begin
                     state <= IDLE;
                     busy  <= 1'b0;
-                    done  <= 1'b1;
+                    uio_out  <= 1'b1;
                 end
             end
 
