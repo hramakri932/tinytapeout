@@ -26,9 +26,8 @@ async def run_sqrt(dut, value):
     dut.uio_in.value=0
 
     # Wait until uio_out is set to busy
-    while dut.uio_out.value == 0:
+    while dut.uio_out.value.is_resolvable and dut.uio_out.value == 0:
         await RisingEdge(dut.clk)
-        cocotb.log.info(f"Cycle {_}: uo_out={dut.uo_out.value.binstr}, remainder={dut.remainder.value.binstr}")
 
     
     result = dut.uo_out.value.to_unsigned()
@@ -68,11 +67,12 @@ async def test_random_values(dut):
     cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
 
     await rst_n_dut(dut)
+    await RisingEdge(dut.clk)
 
     for _ in range(50):
         value = random.randint(0, 255)
         expected = int(math.isqrt(value))
-
+        cocotb.log.info(f"e:{expected}")
         result = await run_sqrt(dut, value)
 
         assert result == expected, \
