@@ -29,7 +29,7 @@ async def run_sqrt(dut, value):
     while dut.uio_out.value == 0:
         await RisingEdge(dut.clk)
 
-    result = dut.uo_out.value.integer
+    result = dut.uo_out.value.to_unsigned()
     return result
 
 
@@ -37,7 +37,7 @@ async def run_sqrt(dut, value):
 async def test_basic_values(dut):
     """Test some known values"""
 
-    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
 
     await rst_n_dut(dut)
 
@@ -63,7 +63,7 @@ async def test_basic_values(dut):
 async def test_random_values(dut):
     """Randomized testing"""
 
-    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
 
     await rst_n_dut(dut)
 
