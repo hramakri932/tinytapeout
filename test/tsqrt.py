@@ -29,8 +29,8 @@ async def run_sqrt(dut, value):
     while dut.uio_out.value.is_resolvable and dut.uio_out.value == 0:
         await RisingEdge(dut.clk)
 
-    
-    result = dut.uo_out.value.to_unsigned()
+
+    result = dut.uo_out.value
     return result
 
 
