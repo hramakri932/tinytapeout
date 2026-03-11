@@ -5,7 +5,8 @@ module tt_um_sqrt_int #(
     parameter WIDTH = 8  // must be even
 )(
     input  wire                 clk,
-    input  wire                 rst,      // active HIGH
+    input  wire                 ena,      // mandatory reset pin
+    input  wire                 reset,    //active HIGH
     input  wire                 start,
     input  wire [WIDTH-1:0]     radicand,
     output reg  [WIDTH/2-1:0]   root,
@@ -26,6 +27,9 @@ module tt_um_sqrt_int #(
     localparam IDLE = 1'b0;
     localparam RUN  = 1'b1;
     reg state;
+
+    wire rst;
+    assign rst = reset | ena;
 
     always @(posedge clk) begin
         if (rst) begin

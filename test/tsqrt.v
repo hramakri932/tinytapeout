@@ -33,7 +33,8 @@ module tb ();
 `endif
 
       .clk      (clk),
-      .rst      (rst),      // direct connection
+      .ena      (ena),
+      .reset    (reset),
       .start    (start),
       .radicand (radicand),
       .root     (root),

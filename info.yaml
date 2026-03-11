@@ -24,10 +24,10 @@ project:
 pinout:
   # Inputs
   ui[0]: "clk"
-  ui[1]: "rst"
-  ui[2]: "start"
-  ui[3]: "radicand"
-  ui[4]: ""
+  ui[1]: "reset"
+  ui[2]: "ena"
+  ui[3]: "start"
+  ui[4]: "radicand"
   ui[5]: ""
   ui[6]: ""
   ui[7]: ""

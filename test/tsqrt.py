@@ -6,7 +6,8 @@ import math
 
 
 async def reset_dut(dut):
-    dut.rst.value = 1
+    dut.ena.value = 0
+    dut.reset.value = 1
     dut.start.value = 0
     dut.radicand.value = 0
     for _ in range(5):
