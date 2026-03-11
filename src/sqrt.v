@@ -21,9 +21,6 @@ module tt_um_sqrt_int #(
     reg [WIDTH-1:0] radicand_shift;
     reg [$clog2(ITER+1)-1:0] count;
 
-    reg [WIDTH-1:0] remainder_next;
-    reg [WIDTH-1:0] trial;
-
     localparam IDLE = 1'b0;
     localparam RUN  = 1'b1;
     reg state;
@@ -32,20 +29,18 @@ module tt_um_sqrt_int #(
     wire start = uio_in[0];
     wire [7:0] radicand = ui_in;
     assign uio_oe = 8'b0;
-    reg [WIDTH-1:0] root;
     reg busy;
-    reg done;
-    // always @(*) begin
-    // //uo_out = root;
-    // //uio_out = {7'b0, done};
-    // end
+
+    // Minimal fix: remainder_next and trial as wires
+    wire [WIDTH-1:0] remainder_next = {remainder[WIDTH-3:0], radicand_shift[WIDTH-1:WIDTH-2]};
+    wire [WIDTH-1:0] trial        = {uo_out[5:0], 2'b01};
 
     always @(posedge clk) begin
         if (rst) begin
             state          <= IDLE;
             busy           <= 1'b0;
-            uio_out           <= 8'b0;
-            uo_out           <= 0;
+            uio_out        <= 8'b0;
+            uo_out         <= 0;
             remainder      <= 0;
             radicand_shift <= 0;
             count          <= 0;
@@ -58,28 +53,24 @@ module tt_um_sqrt_int #(
 
                 if (start) begin
                     busy           <= 1'b1;
-                    uo_out           <= 0;
+                    uo_out         <= 0;
                     remainder      <= 0;
                     radicand_shift <= radicand;
-                    count          <= ITER[2:0];
+                    count          <= ITER;  // minimal fix: avoid truncation
                     state          <= RUN;
                 end
             end
 
             RUN: begin
                 // Bring down next 2 bits (MSB-first)
-                remainder_next = {remainder[WIDTH-3:0], radicand_shift[WIDTH-1:WIDTH-2]};
                 radicand_shift <= {radicand_shift[WIDTH-3:0], 2'b00};
-
-                // trial = (uo_out << 2) | 1
-                trial = ({uo_out[5:0], 2'b1});
 
                 if (remainder_next >= trial) begin
                     remainder <= remainder_next - trial;
-                    uo_out      <= {4'b0, uo_out[WIDTH/2-2:0], 1'b1};
+                    uo_out    <= {4'b0, uo_out[WIDTH/2-2:0], 1'b1};
                 end else begin
                     remainder <= remainder_next;
-                    uo_out      <= {4'b0, uo_out[WIDTH/2-2:0], 1'b0};
+                    uo_out    <= {4'b0, uo_out[WIDTH/2-2:0], 1'b0};
                 end
 
                 count <= count - 1;
@@ -87,7 +78,7 @@ module tt_um_sqrt_int #(
                 if (count == 1) begin
                     state <= IDLE;
                     busy  <= 1'b0;
-                    uio_out[0]  <= 1'b1;
+                    uio_out[0] <= 1'b1;
                 end
             end
 
