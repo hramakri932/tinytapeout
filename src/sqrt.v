@@ -34,7 +34,6 @@ module tt_um_sqrt_int #(
     // Minimal fix: remainder_next and trial as wires
     wire [WIDTH-1:0] remainder_next = {remainder[WIDTH-3:0], radicand_shift[WIDTH-1:WIDTH-2]};
     wire [WIDTH-1:0] trial        = {uo_out[5:0], 2'b01};
-
     always @(posedge clk) begin
         if (rst) begin
             state          <= IDLE;
@@ -49,10 +48,10 @@ module tt_um_sqrt_int #(
             case (state)
 
             IDLE: begin
-            uio_out <= 0;
+            //uio_out <= 0;
 
                 if (start) begin
-                    
+                    uio_out <= 0;
                     busy           <= 1'b1;
                     uo_out         <= 0;
                     remainder      <= 0;
@@ -68,10 +67,10 @@ module tt_um_sqrt_int #(
 
                 if (remainder_next >= trial) begin
                     remainder <= remainder_next - trial;
-                    uo_out    <= {4'b0, uo_out[WIDTH/2-2:0], 1'b1};
+                    uo_out    <= {4'b0, uo_out[2:0], 1'b1};
                 end else begin
                     remainder <= remainder_next;
-                    uo_out    <= {4'b0, uo_out[WIDTH/2-2:0], 1'b0};
+                    uo_out    <= {4'b0, uo_out[2:0], 1'b0};
                 end
 
                 count <= count - 1;
