@@ -43,7 +43,7 @@ module tt_um_sqrt_int #(
         if (rst) begin
             state          <= IDLE;
             busy           <= 1'b0;
-            uio_out[0]           <= 1'b0;
+            uio_out           <= 8'b0;
             uo_out           <= 0;
             remainder      <= 0;
             radicand_shift <= 0;
