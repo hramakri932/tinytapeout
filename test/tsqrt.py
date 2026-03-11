@@ -28,6 +28,8 @@ async def run_sqrt(dut, value):
     # Wait until uio_out is set to busy
     while dut.uio_out.value == 0:
         await RisingEdge(dut.clk)
+        cocotb.log.info(f"Cycle {_}: uo_out={dut.uo_out.value.binstr}, remainder={dut.remainder.value.binstr}")
+
     
     result = dut.uo_out.value.to_unsigned()
     return result
