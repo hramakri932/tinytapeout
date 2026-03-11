@@ -22,8 +22,8 @@ async def run_sqrt(dut, value):
     await RisingEdge(dut.clk)
     dut.start.value = 0
 
-    # Wait until done goes high
-    while dut.done.value == 0:
+    # Wait until uio_out is set to busy
+    while dut.uio_out.value == 0:
         await RisingEdge(dut.clk)
 
     result = dut.uo_out.value.integer

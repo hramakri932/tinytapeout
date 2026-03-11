@@ -7,13 +7,10 @@ module tt_um_sqrt_int #(
     input  wire                 clk,
     input  wire                 ena,      // mandatory enable pin
     input  wire                 rst_n,    //active LOW
-    input  wire                 start,
     input  wire [WIDTH-1:0]     ui_in,
     output reg  [WIDTH-1:0]   uo_out, 
-    output reg                  busy,
-    output reg                  done,
-    output wire [7:0]            uio_oe, // remaining unused
-    output wire [7:0]            uio_out,
+    output wire [7:0]            uio_oe, 
+    output reg [7:0]            uio_out,
     input wire  [7:0]            uio_in
 );
 
@@ -32,12 +29,13 @@ module tt_um_sqrt_int #(
     reg state;
 
     wire rst = ~rst_n | ~ena;
-    assign uio_oe = 8'b0;
-    assign uio_out = 8'b0;
+    wire start = uio_in;
     wire [7:0] radicand = ui_in;
     reg [WIDTH/2-1:0] root;
+    reg busy, done;
     always @(*) begin
     uo_out = root;
+    uio_out = done;
     end
 
     always @(posedge clk) begin
