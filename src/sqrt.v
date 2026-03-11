@@ -19,7 +19,7 @@ module tt_um_sqrt_int #(
     // Internal registers
     reg [WIDTH-1:0] remainder;
     reg [WIDTH-1:0] radicand_shift;
-    reg [$clog2(ITER+1)-1:0] count;
+    reg [WIDTH/2:0] count;
 
     localparam IDLE = 1'b0;
     localparam RUN  = 1'b1;
@@ -49,9 +49,10 @@ module tt_um_sqrt_int #(
             case (state)
 
             IDLE: begin
-                uio_out[0] <= 1'b0;
+            uio_out <= 0;
 
                 if (start) begin
+                    
                     busy           <= 1'b1;
                     uo_out         <= 0;
                     remainder      <= 0;
@@ -78,7 +79,7 @@ module tt_um_sqrt_int #(
                 if (count == 1) begin
                     state <= IDLE;
                     busy  <= 1'b0;
-                    uio_out[0] <= 1'b1;
+                    uio_out <= 1;
                 end
             end
 

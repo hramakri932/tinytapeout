@@ -26,7 +26,7 @@ async def run_sqrt(dut, value):
     dut.uio_in.value=0
 
     # Wait until uio_out is set to busy
-    while dut.uio_out.value != 1:
+    while dut.uio_out.value == 0:
         await RisingEdge(dut.clk)
     
     result = dut.uo_out.value.to_unsigned()
