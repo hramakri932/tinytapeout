@@ -29,13 +29,13 @@ module tt_um_sqrt_int #(
     reg state;
 
     wire rst = ~rst_n | ~ena;
-    wire start = uio_in;
+    wire start = uio_in[0];
     wire [7:0] radicand = ui_in;
-    reg [WIDTH/2-1:0] root;
+    reg [WIDTH-1:0] root;
     reg busy, done;
     always @(*) begin
     uo_out = root;
-    uio_out = done;
+    uio_out = {7'b0, done};
     end
 
     always @(posedge clk) begin
@@ -59,7 +59,7 @@ module tt_um_sqrt_int #(
                     root           <= 0;
                     remainder      <= 0;
                     radicand_shift <= radicand;
-                    count          <= ITER;
+                    count          <= ITER[2:0];
                     state          <= RUN;
                 end
             end
@@ -70,14 +70,14 @@ module tt_um_sqrt_int #(
                 radicand_shift <= {radicand_shift[WIDTH-3:0], 2'b00};
 
                 // trial = (root << 2) | 1
-                trial = ({root, 2'b1});
+                trial = ({root[5:0], 2'b1});
 
                 if (remainder_next >= trial) begin
                     remainder <= remainder_next - trial;
-                    root      <= {root[WIDTH/2-2:0], 1'b1};
+                    root      <= {4'b0, root[WIDTH/2-2:0], 1'b1};
                 end else begin
                     remainder <= remainder_next;
-                    root      <= {root[WIDTH/2-2:0], 1'b0};
+                    root      <= {4'b0, root[WIDTH/2-2:0], 1'b0};
                 end
 
                 count <= count - 1;
