@@ -5,13 +5,16 @@ module tt_um_sqrt_int #(
     parameter WIDTH = 8  // must be even
 )(
     input  wire                 clk,
-    input  wire                 ena,      // mandatory reset pin
-    input  wire                 reset,    //active HIGH
+    input  wire                 ena,      // mandatory enable pin
+    input  wire                 rst_n,    //active LOW
     input  wire                 start,
-    input  wire [WIDTH-1:0]     radicand,
-    output reg  [WIDTH/2-1:0]   root,
+    input  wire [WIDTH-1:0]     ui_in,
+    output reg  [WIDTH/2-1:0]   uo_out, 
     output reg                  busy,
-    output reg                  done
+    output reg                  done,
+    output wire [7:0]            uio_oe, // remaining unused
+    output wire [7:0]            uio_out,
+    input wire  [7:0]            uio_in
 );
 
     localparam ITER = WIDTH/2;
@@ -28,8 +31,14 @@ module tt_um_sqrt_int #(
     localparam RUN  = 1'b1;
     reg state;
 
-    wire rst;
-    assign rst = reset | ena;
+    wire rst = ~rst_n | ~ena;
+    assign uio_oe = 8'b0;
+    assign uio_out = 8'b0;
+    wire [7:0] radicand = ui_in;
+    reg [WIDTH/2-1:0] root;
+    always @(*) begin
+    uo_out = root;
+    end
 
     always @(posedge clk) begin
         if (rst) begin

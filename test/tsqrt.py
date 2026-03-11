@@ -5,19 +5,19 @@ import random
 import math
 
 
-async def reset_dut(dut):
-    dut.ena.value = 0
-    dut.reset.value = 1
+async def rst_n_dut(dut):
+    dut.rst_n.value = 0
+    dut.ena.value = 1
     dut.start.value = 0
-    dut.radicand.value = 0
+    dut.ui_in.value = 0
     for _ in range(5):
         await RisingEdge(dut.clk)
-    dut.rst.value = 0
+    dut.rst_n.value = 1
     await RisingEdge(dut.clk)
 
 
 async def run_sqrt(dut, value):
-    dut.radicand.value = value
+    dut.ui_in.value = value
     dut.start.value = 1
     await RisingEdge(dut.clk)
     dut.start.value = 0
@@ -26,7 +26,7 @@ async def run_sqrt(dut, value):
     while dut.done.value == 0:
         await RisingEdge(dut.clk)
 
-    result = dut.root.value.integer
+    result = dut.uo_out.value.integer
     return result
 
 
@@ -36,7 +36,7 @@ async def test_basic_values(dut):
 
     cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
 
-    await reset_dut(dut)
+    await rst_n_dut(dut)
 
     test_vectors = {
         0: 0,
@@ -62,7 +62,7 @@ async def test_random_values(dut):
 
     cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
 
-    await reset_dut(dut)
+    await rst_n_dut(dut)
 
     for _ in range(50):
         value = random.randint(0, 255)
