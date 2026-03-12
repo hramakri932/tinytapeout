@@ -1,85 +1,81 @@
 `default_nettype none
 `timescale 1ns / 1ps
 
-module tt_um_sqrt_int #(
-    parameter WIDTH = 8  // must be even
-)(
-    input  wire                 clk,
-    input  wire                 ena,      // mandatory enable pin
-    input  wire                 rst_n,    //active LOW
-    input  wire [WIDTH-1:0]     ui_in,
-    output reg  [WIDTH-1:0]   uo_out, 
-    output wire [7:0]            uio_oe, 
-    output reg [7:0]            uio_out,
-    input wire  [7:0]            uio_in
+module tt_um_sqrt_int (
+    input  wire       clk,
+    input  wire       ena,
+    input  wire       rst_n,
+    input  wire [7:0] ui_in,
+    output reg  [7:0] uo_out,
+    output wire [7:0] uio_oe,
+    output wire [7:0] uio_out,
+    input  wire [7:0] uio_in
 );
 
-    localparam ITER = WIDTH/2;
+    assign uio_oe  = 8'b0;
+    assign uio_out = 8'b0;
 
-    // Internal registers
-    reg [WIDTH-1:0] remainder;
-    reg [WIDTH-1:0] radicand_shift;
-    reg [WIDTH/2:0] count;
+    localparam ITER = 4;
 
     localparam IDLE = 1'b0;
     localparam RUN  = 1'b1;
+
     reg state;
 
-    wire rst = ~(rst_n & ena);
-    wire start = uio_in[0];
-    wire [7:0] radicand = ui_in;
-    assign uio_oe = 8'b0;
-    reg busy;
+    reg [7:0] radicand;
+    reg [7:0] remainder;
+    reg [2:0] count;
 
-    // Minimal fix: remainder_next and trial as wires
-    wire [WIDTH-1:0] remainder_next = {remainder[WIDTH-3:0], radicand_shift[WIDTH-1:WIDTH-2]};
-    wire [WIDTH-1:0] trial        = {uo_out[5:0], 2'b01};
+    // combine enable and reset into one reset signal
+    wire rst = ~rst_n | ~ena;
+
+    // detect rst_n rising edge (start signal)
+    reg rst_n_d;
+    always @(posedge clk)
+        rst_n_d <= rst_n;
+
+    wire start = rst_n & ~rst_n_d;
+
+    wire [7:0] trial    = (uo_out << 2) | 8'd1;
+    wire [7:0] rem_next = {remainder[5:0], radicand[7:6]};
+
     always @(posedge clk) begin
         if (rst) begin
-            state          <= IDLE;
-            busy           <= 1'b0;
-            uio_out        <= 8'b0;
-            uo_out         <= 0;
-            remainder      <= 0;
-            radicand_shift <= 0;
-            count          <= 0;
-        end else begin
-
+            state     <= IDLE;
+            uo_out    <= 0;
+            remainder <= 0;
+            radicand  <= 0;
+            count     <= 0;
+        end
+        else begin
             case (state)
 
             IDLE: begin
-            //uio_out <= 0;
-
                 if (start) begin
-                    uio_out <= 0;
-                    busy           <= 1'b1;
-                    uo_out         <= 0;
-                    remainder      <= 0;
-                    radicand_shift <= radicand;
-                    count          <= ITER;  // minimal fix: avoid truncation
-                    state          <= RUN;
+                    radicand  <= ui_in;
+                    remainder <= 0;
+                    uo_out    <= 0;
+                    count     <= ITER;
+                    state     <= RUN;
                 end
             end
 
             RUN: begin
-                // Bring down next 2 bits (MSB-first)
-                radicand_shift <= {radicand_shift[WIDTH-3:0], 2'b00};
+                radicand <= {radicand[5:0], 2'b00};
 
-                if (remainder_next >= trial) begin
-                    remainder <= remainder_next - trial;
-                    uo_out    <= {4'b0, uo_out[2:0], 1'b1};
-                end else begin
-                    remainder <= remainder_next;
-                    uo_out    <= {4'b0, uo_out[2:0], 1'b0};
+                if (rem_next >= trial) begin
+                    remainder <= rem_next - trial;
+                    uo_out    <= (uo_out << 1) | 8'b1;
+                end
+                else begin
+                    remainder <= rem_next;
+                    uo_out    <= (uo_out << 1);
                 end
 
                 count <= count - 1;
 
-                if (count == 1) begin
+                if (count == 1)
                     state <= IDLE;
-                    busy  <= 1'b0;
-                    uio_out <= 1;
-                end
             end
 
             endcase
