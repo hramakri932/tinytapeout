@@ -13,7 +13,7 @@ module tt_um_sqrt_int (
 );
 
     assign uio_oe  = 8'b0;
-    assign uio_out = 8'b0;
+    assign uio_out = {7'b0,state};
 
     localparam ITER = 4;
 
@@ -36,7 +36,7 @@ module tt_um_sqrt_int (
 
     wire start = rst_n & ~rst_n_d;
 
-    wire [7:0] trial    = (uo_out << 2) | 8'd1;
+    wire [7:0] trial    = (uo_out << 2) | 8'b1;
     wire [7:0] rem_next = {remainder[5:0], radicand[7:6]};
 
     always @(posedge clk) begin

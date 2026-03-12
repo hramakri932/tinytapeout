@@ -13,9 +13,19 @@ async def start_sqrt(dut, value):
     f"rst_n:{dut.rst_n.value} "
     f"ui_in:{dut.ui_in.value} "
     f"uo_out:{dut.uo_out.value} "
+    f"state:{dut.uio_out.value}"
+    )
+    
+    await RisingEdge(dut.clk)
+    cocotb.log.info(f"a1"
+    f"clk:{dut.clk.value} "
+    f"ena:{dut.ena.value} "
+    f"rst_n:{dut.rst_n.value} "
+    f"ui_in:{dut.ui_in.value} "
+    f"uo_out:{dut.uo_out.value} "
+    f"state:{dut.uio_out.value}"
     )
     dut.ui_in.value = value
-
     # force reset low
     dut.rst_n.value = 0
     await RisingEdge(dut.clk)
@@ -25,6 +35,7 @@ async def start_sqrt(dut, value):
     f"rst_n:{dut.rst_n.value} "
     f"ui_in:{dut.ui_in.value} "
     f"uo_out:{dut.uo_out.value} "
+    f"state:{dut.uio_out.value}"
     )
     await RisingEdge(dut.clk)
     cocotb.log.info(f"b1"
@@ -33,26 +44,38 @@ async def start_sqrt(dut, value):
     f"rst_n:{dut.rst_n.value} "
     f"ui_in:{dut.ui_in.value} "
     f"uo_out:{dut.uo_out.value} "
+    f"state:{dut.uio_out.value}"
+    )
+    await RisingEdge(dut.clk)
+    cocotb.log.info(f"b2"
+    f"clk:{dut.clk.value} "
+    f"ena:{dut.ena.value} "
+    f"rst_n:{dut.rst_n.value} "
+    f"ui_in:{dut.ui_in.value} "
+    f"uo_out:{dut.uo_out.value} "
+    f"state:{dut.uio_out.value}"
     )
     # release reset -> computation starts
     dut.rst_n.value = 1
 
     # wait long enough for computation
-    for _ in range(5):
-        cocotb.log.info(f"c"
+    for _ in range(6):
+        await RisingEdge(dut.clk)
+        cocotb.log.info(f"c{_}"
             f"clk:{dut.clk.value} "
             f"ena:{dut.ena.value} "
             f"rst_n:{dut.rst_n.value} "
             f"ui_in:{dut.ui_in.value} "
             f"uo_out:{dut.uo_out.value} "
+            f"state:{dut.uio_out.value}"
             )
-        await RisingEdge(dut.clk)
     cocotb.log.info(f"d"
     f"clk:{dut.clk.value} "
     f"ena:{dut.ena.value} "
     f"rst_n:{dut.rst_n.value} "
     f"ui_in:{dut.ui_in.value} "
     f"uo_out:{dut.uo_out.value} "
+    f"state:{dut.uio_out.value}"
     )
 
 
@@ -60,7 +83,7 @@ async def start_sqrt(dut, value):
 async def test_known_values(dut):
     """Test predetermined inputs."""
 
-    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
 
     dut.ena.value = 1
     dut.rst_n.value = 1
@@ -81,8 +104,9 @@ async def test_known_values(dut):
 
         await start_sqrt(dut, val)
 
-        result = dut.uo_out.value.integer
+        result = dut.uo_out.value
         expected = int(math.isqrt(val))
+        cocotb.log.info(f"result:{result},expected{expected}")
 
         assert result == expected, \
             f"sqrt({val}) expected {expected} got {result}"
@@ -92,7 +116,7 @@ async def test_known_values(dut):
 async def test_random_values(dut):
     """Test random inputs."""
 
-    cocotb.start_soon(Clock(dut.clk, 10, units="ns").start())
+    cocotb.start_soon(Clock(dut.clk, 10, unit="ns").start())
 
     dut.ena.value = 1
     dut.rst_n.value = 1
@@ -106,7 +130,7 @@ async def test_random_values(dut):
 
         await start_sqrt(dut, val)
 
-        result = dut.uo_out.value.integer
+        result = dut.uo_out.value
         expected = int(math.isqrt(val))
 
         assert result == expected, \
