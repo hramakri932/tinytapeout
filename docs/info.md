@@ -13,9 +13,9 @@ This project implements an integer square root module which computes the floor o
 
 $\text{root}=\lfloor{\sqrt{\text{radicand}}}\rfloor{}$
 
-On `start`, the input radicand is loaded and the computation begins. Each clock cycle processes two bits of the input, updating an internal remainder and builds the result one bit at a time. After WIDTH/2 cycles, the result is available on the `root` output.
+On `start`, the input radicand is loaded and the computation begins. The start is asserted by a rising edge of the active low reset signal `rst_n`. Each clock cycle processes two bits of the input, updating an internal remainder and builds the result one bit at a time. After 5 cycles, the result is available on the `uo_out` output.
 
-The `busy` signal is asserted while computation is in progress. The `done` signal is asserted for one clock cycle when the result is ready. The reset signal is active high and returns the module to the idle state. During this reset sate both `done` and `busy` will be low.
+To time the read of the values simply wait a sufficient amount of time. The module will enter an idle state that retains uo_out after the computation finishes so the timing of the read isn't critical. The reset signal is active high and returns the module to the idle state. 
 
 
 ## How to test
