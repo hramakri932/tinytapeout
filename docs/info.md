@@ -38,6 +38,3 @@ No external hardware is needed.
 
 The testbench is sufficient because it tests necessary edge cases and also randomized numbers within the valid input range of the verilog module. Since the design is synchronous, there is no need to test edge cases such asynchronous input as that it not how it is intended to be used. 
 
-## Use of generative AI
-
-Ai was used to generate the verilog and the testbench. The docs were written myself. 
